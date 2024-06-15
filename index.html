@@ -4,91 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTube Visualizer</title>
-    <link rel="stylesheet" href="https://thatonegpttester.github.io/HTML-visual-tester/styles.css">
-<style>
-body {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: #000;
-    color: #fff;
-    font-family: Arial, sans-serif;
-}
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
 
-#player-container {
-    width: 100%;
-    max-width: 640px;
-    margin: 20px 0;
-}
+        #player-container {
+            width: 100%;
+            max-width: 640px;
+            margin: 20px 0;
+        }
 
-#visualizer-container {
-    width: 100%;
-    max-width: 640px;
-}
+        #visualizer-container {
+            width: 100%;
+            max-width: 640px;
+        }
 
-canvas {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-</style>
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .controls {
+            margin: 20px;
+        }
+    </style>
 </head>
 <body>
     <div id="player-container">
         <div id="player"></div>
     </div>
+    <div class="controls">
+        <input type="text" id="videoIdInput" placeholder="Enter YouTube Video ID">
+        <button onclick="loadNewVideo()">Load Video</button>
+        <label for="colorPicker">Visualizer Color:</label>
+        <input type="color" id="colorPicker" value="#00ff00" onchange="updateVisualizerColor()">
+    </div>
     <div id="visualizer-container">
         <canvas id="visualizer"></canvas>
     </div>
+
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script>
-let player;
-let canvas;
-let fft;
+        let player;
+        let canvas;
+        let fft;
+        let visualizerColor = '#00ff00';
 
-function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
-        height: '360',
-        width: '640',
-        videoId: 'LG5Bzw6OlBk', // Replace with a default video ID or make it user-input
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: 'LG5Bzw6OlBk', // Replace with a default video ID or leave blank for user input
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
         }
-    });
-}
 
-function onPlayerReady(event) {
-    event.target.playVideo();
-}
+        function onPlayerReady(event) {
+            event.target.playVideo();
+        }
 
-function onPlayerStateChange(event) {
-    if (event.data == YT.PlayerState.PLAYING) {
-        startVisualizer();
-    }
-}
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                startVisualizer();
+            }
+        }
 
-function startVisualizer() {
-    canvas = createCanvas(640, 360);
-    canvas.parent('visualizer-container');
-    fft = new p5.FFT();
-}
+        function loadNewVideo() {
+            const videoId = document.getElementById('videoIdInput').value;
+            player.loadVideoById(videoId);
+        }
 
-function draw() {
-    background(0);
-    let spectrum = fft.analyze();
-    noStroke();
-    fill(0, 255, 0); // Green color for visualizer bars
+        function updateVisualizerColor() {
+            visualizerColor = document.getElementById('colorPicker').value;
+        }
 
-    for (let i = 0; i < spectrum.length; i++) {
-        let x = map(i, 0, spectrum.length, 0, width);
-        let h = -height + map(spectrum[i], 0, 255, height, 0);
-        rect(x, height, width / spectrum.length, h);
-    }
-}
-</script>
+        function startVisualizer() {
+            canvas = createCanvas(640, 360);
+            canvas.parent('visualizer-container');
+            fft = new p5.FFT();
+        }
+
+        function draw() {
+            background(0);
+            let spectrum = fft.analyze();
+            noStroke();
+            fill(visualizerColor); // Use the selected color
+
+            for (let i = 0; i < spectrum.length; i++) {
+                let x = map(i, 0, spectrum.length, 0, width);
+                let h = -height + map(spectrum[i], 0, 255, height, 0);
+                rect(x, height, width / spectrum.length, h);
+            }
+        }
+    </script>
 </body>
 </html>
