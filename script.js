@@ -6,7 +6,7 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '360',
         width: '640',
-        videoId: 'YOUR_VIDEO_ID', // Replace with a default video ID or make it user-input
+        videoId: 'LG5Bzw6OlBk', // Replace with a default video ID or make it user-input
         events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange
