@@ -64,7 +64,7 @@
             player = new YT.Player('player', {
                 height: '360',
                 width: '640',
-                videoId: 'LG5Bzw6OlBk', // Replace with a default video ID or leave blank for user input
+                videoId: '', // Leave blank for user input
                 events: {
                     'onReady': onPlayerReady,
                     'onStateChange': onPlayerStateChange
@@ -92,9 +92,12 @@
         }
 
         function startVisualizer() {
-            canvas = createCanvas(640, 360);
-            canvas.parent('visualizer-container');
-            fft = new p5.FFT();
+            if (!canvas) {
+                canvas = createCanvas(640, 360);
+                canvas.parent('visualizer-container');
+                fft = new p5.FFT();
+            }
+            loop();
         }
 
         function draw() {
@@ -108,6 +111,10 @@
                 let h = -height + map(spectrum[i], 0, 255, height, 0);
                 rect(x, height, width / spectrum.length, h);
             }
+        }
+
+        function setup() {
+            noLoop(); // Start with the visualizer not running
         }
     </script>
 </body>
